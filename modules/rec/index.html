@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Convertisseur PDF – Récap</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header><b>SALIPRO</b><span>Zone document · Convertisseur PDF → Tableau / Récap</span></header>
+<main>
+ <div class="card">
+  <div id="drop"><b>Dépose ton PDF ici</b>ou clique pour choisir un fichier (récap, factures, listes…)</div>
+  <input type="file" id="file" accept="application/pdf" hidden>
+  <label style="flex-direction:row;align-items:center;gap:6px;margin:8px 0"><input type="checkbox" id="firstpages" checked>Lire seulement les premières pages de la facture (de 1 / N jusqu'à N / N), ignorer les pages après</label>
+  <div class="row" style="margin:6px 0"><button id="brem" class="sec" hidden>🗑 Retirer la facture</button></div>
+  <p id="msg"></p>
+ </div>
+ <div class="card" id="tools" hidden>
+  <div class="row">
+   <label>Séparation colonnes (px)<input type="number" id="gap" value="8" min="2" max="40" style="width:90px"></label>
+   <label style="flex-direction:row;align-items:center;gap:6px;margin-top:16px"><input type="checkbox" id="hdr" checked>1re ligne = en-têtes</label>
+   <label>Colonne à filtrer<select id="col"></select></label>
+   <label>Recherche<input id="q" placeholder="Rechercher…"></label>
+   <div class="stat" id="count"></div>
+  </div>
+  <div class="row" style="margin-top:10px">
+   <label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="only3" checked>Garder seulement Désignation + Quantité</label>
+   <label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="withcode">Inclure le code</label>
+   <label>N° colonne quantité<input type="number" id="qn" value="5" min="0" style="width:80px" title="Numéro de la colonne de la quantité dans la facture (vide ou 0 = automatique)"></label>
+   <label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="tzero" checked>Total = 0 pour toutes les lignes</label>
+   <label>N° colonne P.U<input type="number" id="pun" min="0" placeholder="auto" style="width:80px" title="Vide = détection automatique par en-tête (P.U / Prix)"></label>
+   <label>N° colonne Total<input type="number" id="ttn" min="0" placeholder="auto" style="width:80px" title="Vide = détection automatique par en-tête (Total / Montant)"></label>
+   <label>Ou par nom (si N° vide)<select id="qsel"><option value="">Auto</option></select></label>
+   <label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="manual">Choisir les colonnes à la main</label>
+   <label>Couper la désignation à partir de (regex)<input id="cut" value="\bL\d{5,}\b|\b\d{4}-\d{2}-\d{2}\b|\b\d{2}[/.-]\d{2}[/.-]\d{4}\b|\(\d+/\d+\)" style="width:260px" title="Lot (L25452199), date (2027-12-31), conditionnement (10/1)"></label>
+  </div>
+  <div class="row" id="pk" style="margin-top:10px" hidden>
+   <label>Colonne Code<select id="p1"></select></label>
+   
+   <label>Format du code (regex)<input id="cre" value="^\d{4,8}$" style="width:110px" title="Exemple: 02145 = 5 chiffres"></label>
+   <label>Colonne Désignation<select id="p2"></select></label>
+   <label>Colonne Quantité<select id="p3"></select></label>
+  </div>
+  <div id="hlist" style="color:var(--mu);font-size:12px;margin-top:8px"></div>
+  <div class="chips" id="chips" style="margin-top:10px"></div>
+ </div>
+ <div class="card" id="tbl" hidden>
+  <div class="wrap"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div>
+  <details style="margin-top:10px"><summary id="sks" style="cursor:pointer;color:var(--mu)">Lignes ignorées</summary><pre id="skp" style="white-space:pre-wrap;max-height:200px;overflow:auto;font-size:12px"></pre></details>
+ </div>
+ <div class="card" id="exp" hidden>
+  <div class="row">
+   <label>Nom du livreur (optionnel)<select id="liv"><option value="">—</option></select></label>
+   <label>Titre (optionnel)<input id="ttl" value="" placeholder="Aucun titre" style="width:220px"></label>
+   <button id="bpdf" style="margin-top:16px">Exporter PDF</button>
+   <button id="bxls" class="sec" style="margin-top:16px">Excel (.xlsx)</button>
+   <button id="bcsv" class="sec" style="margin-top:16px">CSV</button>
+  </div>
+  <p style="color:var(--mu);margin:8px 0 0">L'export contient uniquement les lignes affichées (après filtre). Tu peux corriger une cellule en cliquant dessus.</p>
+ </div>
+
+<div class="card" id="mdl" hidden>
+  <b>Transformer en modèle client</b>
+  <div class="row" style="margin-top:10px">
+   <label>Modèle<select id="mod"><option>ANSAMBLE</option><option>CINCOREST</option><option>NEWREST</option><option>PROXIREST</option></select></label>
+   <label>Date<input type="date" id="mdate"></label>
+   <label>Site<select id="msite"><option value="">—</option><option>APTIV M2</option><option>APTIV M7</option><option>TE TECHNOLOGIE</option><option>VALEO VISION</option><option>SNOP</option><option>RENAULT CUISINE CENTRAL</option></select></label>
+   <label>Nouveau site<input id="newsite" placeholder="Ajouter un site" style="width:170px"></label>
+   <button id="addsite" class="sec" style="margin-top:16px">➕ Ajouter</button>
+   <button id="delsite" class="sec" hidden style="margin-top:16px">Supprimer ce site</button>
+   <label>Montant TTC (lu dans la facture)<input id="mttc" placeholder="ex. 12345,67" style="width:150px"></label>
+   <label>Véhicule (matricule)<select id="mmat"><option value="">—</option><option>75243 - D - 26</option><option>75244 - D - 26</option><option>85620 - D - 26</option><option>89737 - D - 26</option><option>77591 - D - 26</option><option>77592 - D - 26</option></select></label>
+   <label>Nouveau matricule<input id="newmat" placeholder="ex. 12345 - D - 26" style="width:170px"></label>
+   <button id="addmat" class="sec" style="margin-top:16px">➕ Ajouter</button>
+   <button id="delmat" class="sec" hidden style="margin-top:16px">Supprimer ce matricule</button>
+  </div>
+  <div class="row" style="margin-top:10px">
+   <label>Colonne désignation<select id="cd"></select></label>
+   <label>Colonne quantité<select id="cq"></select></label>
+   <label>Colonne P.U (optionnel)<select id="cp"></select></label>
+   <label>Colonne Total (optionnel)<select id="ct"></select></label>
+   <label>Partie<select id="part"></select></label>
+   <button id="bmod" style="margin-top:16px">Générer le modèle (.xlsx)</button>
+   <button id="bpdfm" class="sec" style="margin-top:16px">Générer le modèle (.pdf)</button>
+  </div>
+  <div class="row" style="margin-top:10px"><label style="flex:1;min-width:280px">Texte en bas du modèle (sous le TOTAL) : propre à chaque modèle, mémorisé<textarea id="mft" rows="3" style="font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:7px 10px;width:100%"></textarea></label></div>
+  <p id="mnote" style="color:var(--mu);margin:8px 0 0"></p>
+ </div>
+<div class="card" id="dlbox" hidden></div>
+</main>
+<div id="toast"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

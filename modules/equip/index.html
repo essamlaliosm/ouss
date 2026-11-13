@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Besoins équipements</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="bg"></div>
+<div id="splash"><div class="sp"><div class="pill" data-logo></div><p>Suivi logistique</p><i></i></div></div>
+<div class="hd"><div class="pill" data-logo></div><div class="ttl"><h1>Besoins équipements</h1><span id="date"></span></div><button class="ib" id="thm" title="Thème et logo">🎨</button></div>
+<div class="card hide" id="thp"><h2>Thème & logo</h2><div class="sw" id="sw"></div><div class="tool" style="margin:12px 0 0"><label class="btn pri">📎 Importer le logo Salipro<input type="file" id="lf" accept="image/*" hidden></label><button class="btn" id="lr">Retirer le logo</button></div><div style="color:var(--mu);font-size:.78rem;margin-top:8px">Le thème prend automatiquement les couleurs du logo importé.</div></div>
+<div class="tabs"><button class="tab on" data-tab="veh">🚚 Véhicules</button><button class="tab" data-tab="per">👷 Personnel</button><button class="tab" data-tab="ach">📦 Achats</button></div>
+<div id="top"></div>
+<div class="tool" id="tb"><input type="search" id="q" placeholder="🔍 Rechercher…"><button class="btn" id="fm">⚠️ Manquants</button><button class="btn" id="sy">🔄 Équipe</button><button class="btn pri" id="addr">+ Ajouter</button></div>
+<div class="grid" id="grid"></div>
+<div id="ach" style="display:none"></div>
+<div class="card" id="cfgc" style="margin-top:14px"><h2>⚙️ Équipements & quantités requises</h2><div id="cfg"></div><div class="cfg"><input type="text" id="newi" placeholder="Nouvel équipement…"><button class="btn" id="addi">+ Ajouter</button></div></div>
+<script src="js/app.js"></script>
+</body>
+</html>
